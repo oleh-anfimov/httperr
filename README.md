@@ -37,30 +37,25 @@ What you get:
 
 ## How it works
 
-```mermaid
-flowchart LR
-    subgraph before [Without httperr]
-        H1[Handler] --> S1[Set headers]
-        S1 --> S2[WriteHeader]
-        S2 --> S3[Build JSON]
-        S3 --> W1[Write body]
-    end
-    subgraph after [With httperr]
-        H2[Handler] --> E1["httperr.BadRequest(w, err)"]
-        E1 --> W2[Done]
-    end
-```
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Handler
-    participant httperr
-    Client->>Handler: GET /users/42
-    Handler->>httperr: NotFound(w)
-    httperr->>Client: 404 application/json
-    Note over Client: body code 404 error not found
-```
+<table>
+<tr>
+<th>Before</th>
+<th>After</th>
+</tr>
+<tr>
+<td valign="top" width="50%">
+<pre><code class="language-go">w.Header().Set("Content-Type", "application/json")
+w.WriteHeader(http.StatusBadRequest)
+json.NewEncoder(w).Encode(map[string]any{
+    "code":  400,
+    "error": err.Error(),
+})</code></pre>
+</td>
+<td valign="top" width="50%">
+<pre><code class="language-go">httperr.BadRequest(w, err)</code></pre>
+</td>
+</tr>
+</table>
 
 ## Installation
 
